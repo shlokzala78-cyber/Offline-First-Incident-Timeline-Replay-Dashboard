@@ -1,0 +1,12 @@
+{
+  "id": "./",
+  "name": "Traceback — Incident Timeline & Replay",
+  "short_name": "Traceback",
+  "description": "An offline workspace for reconstructing incidents from logs.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f8fc",
+  "theme_color": "#6558e8",
+  "icons": [{ "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

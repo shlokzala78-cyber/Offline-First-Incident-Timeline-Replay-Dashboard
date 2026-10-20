@@ -1,0 +1,5 @@
+{"id":"demo-1","timestamp":"2026-06-14T09:00:00Z","service":"gateway","level":"info","message":"Checkout request received","traceId":"order-42","metadata":{"route":"/checkout"}}
+{"id":"demo-2","timestamp":"2026-06-14T09:00:01Z","service":"payments","level":"warn","message":"Payment provider is slow","traceId":"order-42","durationMs":1200,"metadata":{"attempt":1}}
+{"id":"demo-3","timestamp":"2026-06-14T09:00:03Z","service":"payments","level":"error","message":"Payment request timed out","traceId":"order-42","durationMs":3000,"metadata":{"status":504}}
+{"id":"demo-4","timestamp":"2026-06-14T09:00:07Z","service":"payments","level":"info","message":"Retry succeeded","traceId":"order-42","durationMs":110,"metadata":{"attempt":2}}
+{"id":"demo-5","timestamp":"2026-06-14T09:00:08Z","service":"gateway","level":"info","message":"Checkout completed","traceId":"order-42","metadata":{"status":200}}

@@ -1,0 +1,21 @@
+{
+  "name": "offline-incident-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An offline incident investigation workbench built with native browser APIs.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test",
+    "test:browser:ui": "playwright test --ui",
+    "generate:sample": "node scripts/generate-sample.mjs",
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "fake-indexeddb": "6.2.6"
+  }
+}

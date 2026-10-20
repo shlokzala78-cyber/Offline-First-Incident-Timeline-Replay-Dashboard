@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#6558e8">
+  <meta name="description" content="Import logs, reconstruct an incident, and investigate offline. A local-first incident timeline and replay dashboard.">
+  <title>Traceback — Incident Timeline & Replay</title>
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to investigation</a>
+  <header class="app-header">
+    <a class="brand" href="./" aria-label="Traceback home"><span class="brand-mark" aria-hidden="true">↶</span><span>traceback<span class="brand-caption">INCIDENT WORKBENCH</span></span></a>
+    <div class="header-status"><span class="connection" id="connection-status"><span class="status-dot"></span>Online</span><span id="save-status" class="muted">Starting…</span></div>
+    <div class="header-actions"><button class="button secondary" id="export-button" disabled><span aria-hidden="true">↗</span> Export</button><button class="button primary" id="import-button"><span aria-hidden="true">＋</span> Import logs</button></div>
+  </header>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Investigation navigation and filters">
+      <div class="sidebar-section-label">WORKSPACE <span class="local-label">LOCAL</span></div>
+      <label class="sr-only" for="dataset-select">Saved investigation</label>
+      <select id="dataset-select" class="dataset-select"><option>Loading investigations…</option></select>
+      <div class="sidebar-nav"><button class="nav-item active" id="all-events-button" aria-pressed="true"><span aria-hidden="true">▤</span> All events <span class="nav-count" id="nav-event-count">—</span></button><button class="nav-item" id="bookmarks-button" aria-pressed="false"><span aria-hidden="true">☆</span> Bookmarked <span class="nav-count" id="bookmark-count">0</span></button></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-heading"><h2>Services</h2><button class="text-button" id="clear-services">Reset</button></div>
+      <div id="service-filters" class="service-filters"><p class="muted">Load an incident to see services.</p></div>
+      <div class="sidebar-divider"></div>
+      <h2 class="sidebar-heading">Severity</h2>
+      <div class="severity-filters" id="severity-filters" role="group" aria-label="Filter by severity"></div>
+      <div class="sidebar-bottom"><div class="offline-card"><span class="offline-icon" aria-hidden="true">◇</span><strong>Your investigation, anywhere.</strong><p id="offline-description">Preparing offline access…</p><button class="text-button" id="persist-button">Keep data on this device</button></div><button class="help-button" id="help-button"><span aria-hidden="true">⌘</span> Keyboard shortcuts <kbd>?</kbd></button></div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="page-heading"><div><div class="eyebrow"><span class="tiny-dot"></span> INCIDENT REVIEW <span id="dataset-tag" class="tag">SAMPLE DATA</span></div><h1 id="incident-title">Loading your workspace…</h1><p class="subtitle" id="incident-subtitle">A clear view of what happened, one event at a time.</p></div><div class="heading-actions"><button class="icon-button" id="undo-button" aria-label="Undo view change" title="Undo (Ctrl+Z)" disabled>↶</button><button class="icon-button" id="redo-button" aria-label="Redo view change" title="Redo (Ctrl+Shift+Z)" disabled>↷</button><button class="button secondary compact" id="share-button" disabled>Copy view link</button></div></div>
+      <div class="banner" id="banner" role="status" hidden></div>
+      <div class="stats-grid" aria-label="Incident summary">
+        <div class="stat-card"><span>Total events</span><strong id="stat-events">—</strong><small>Across the full incident</small><span class="stat-symbol lavender" aria-hidden="true">▥</span></div>
+        <div class="stat-card"><span>Error events</span><strong id="stat-errors">—</strong><small id="stat-error-rate">Errors + critical events</small><span class="stat-symbol rose" aria-hidden="true">!</span></div>
+        <div class="stat-card"><span>Services involved</span><strong id="stat-services">—</strong><small>Linked in one timeline</small><span class="stat-symbol mint" aria-hidden="true">⌘</span></div>
+        <div class="stat-card"><span>Incident window</span><strong id="stat-duration">—</strong><small id="stat-window">All times shown in UTC</small><span class="stat-symbol amber" aria-hidden="true">◷</span></div>
+      </div>
+      <section class="timeline-card card" aria-labelledby="timeline-title">
+        <div class="card-heading"><div><h2 id="timeline-title">Incident timeline</h2><p class="muted small">Replay the sequence. Follow the signal.</p></div><div class="chart-legend"><span><i class="dot info"></i>Info / debug</span><span><i class="dot warn"></i>Warning</span><span><i class="dot error"></i>Error / critical</span></div></div>
+        <div class="chart-container"><svg id="histogram" viewBox="0 0 1000 140" preserveAspectRatio="none" role="img" aria-label="Event volume over the selected time window"></svg><div id="chart-empty" class="chart-empty" hidden>No events match these filters</div></div>
+        <div class="chart-ticks" id="chart-ticks" aria-hidden="true"></div>
+        <div class="replay-controls"><button class="icon-button" id="replay-start" aria-label="Return to start" title="Return to start">↤</button><button class="play-button" id="play-button" aria-label="Play incident replay" disabled><span id="play-icon" aria-hidden="true">▶</span><span id="play-label">Replay</span></button><button class="icon-button" id="replay-next" aria-label="Advance to next event" title="Next event">↦</button><div class="replay-time"><strong id="cursor-time">--:--:--</strong><span>UTC</span></div><input id="replay-slider" type="range" min="0" max="1000" value="1000" aria-label="Replay position" disabled><label class="sr-only" for="replay-speed">Replay speed</label><select id="replay-speed" class="speed-select"><option value="1">1×</option><option value="10">10×</option><option value="30" selected>30×</option><option value="60">60×</option><option value="120">120×</option></select><button class="text-button" id="show-all-button">Show all</button></div>
+      </section>
+      <div class="investigation-grid">
+        <section class="events-card card" aria-labelledby="events-title">
+          <div class="events-toolbar"><div class="events-heading"><h2 id="events-title">Event stream</h2><span id="event-count" class="count-pill">0</span></div><button class="text-button" id="reset-filters">Clear filters</button></div>
+          <div class="search-row"><label class="search-box" for="search-input"><span aria-hidden="true">⌕</span><span class="sr-only">Search events</span><input id="search-input" type="search" maxlength="300" placeholder="Search messages, trace IDs, metadata…" autocomplete="off"><kbd>/</kbd></label><button class="button secondary compact" id="time-range-button" title="Set time window">Time window</button></div>
+          <div class="stream-caption"><span id="filter-summary">All services · All severities</span><span>TIME · UTC</span></div>
+          <div id="event-list" class="event-list" role="listbox" tabindex="0" aria-label="Incident events. Use arrow keys to navigate and Enter to inspect."><div id="event-spacer"></div><div id="event-rows"></div></div>
+          <div id="empty-state" class="empty-state" hidden><div aria-hidden="true">⌕</div><h3>No events in this view</h3><p>Try another search, clear your filters, or move the replay forward.</p><button class="button secondary" id="empty-reset">Reset view</button></div>
+          <div class="stream-footer"><span id="stream-summary">Preparing events…</span><span>↑ ↓ Navigate <span class="footer-separator">·</span> Enter Inspect</span></div>
+        </section>
+        <aside class="details-card card" aria-labelledby="details-title"><div class="details-heading"><h2 id="details-title">Event details</h2><button class="icon-button" id="bookmark-event" aria-label="Bookmark selected event" disabled>☆</button></div><div id="details-content" class="details-content"><div class="detail-placeholder"><div class="placeholder-symbol" aria-hidden="true">↖</div><h3>Every event has a story.</h3><p>Select an event to inspect its message, metadata, and trace.</p></div></div><div class="notes-area" id="notes-area" hidden><label for="event-note">Investigation note <span>Saved locally</span></label><textarea id="event-note" rows="3" maxlength="4000" placeholder="What is worth following up on?"></textarea><p class="small muted" id="note-status">Notes are included in investigation exports.</p></div></aside>
+      </div>
+      <footer class="page-footer"><span>Traceback <span class="footer-separator">/</span> Built for the moments between an alert and an answer.</span><button class="text-button danger" id="delete-button">Delete this investigation</button></footer>
+    </main>
+  </div>
+  <dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><div class="dialog-heading"><div><span class="eyebrow">BRING THE EVIDENCE</span><h2 id="import-title">Import incident logs</h2></div><button class="icon-button" type="button" data-close="import-dialog" aria-label="Close import dialog">×</button></div><p class="muted">Choose JSON, JSONL, or a Traceback investigation export. Logs stay in your browser.</p><label class="dropzone" id="dropzone" for="file-input"><span aria-hidden="true">↥</span><strong>Drop a log file here</strong><small>or click to browse · up to 20 MiB / 100,000 events</small><input type="file" id="file-input" accept=".json,.jsonl,.ndjson,application/json"></label><p id="import-file-name" class="small muted">No file selected</p><details class="schema-help"><summary>What should my logs look like?</summary><pre>[{"timestamp":"2026-06-14T14:00:00Z",
+  "service":"checkout", "level":"error",
+  "message":"Payment request timed out",
+  "traceId":"trace-123", "durationMs":2500}]</pre><p class="small muted">Optional: id, metadata. Supported levels: critical, error, warn, info, debug.</p></details><p class="form-error" id="import-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button secondary" id="load-demo-button">Load sample incident</button><button type="submit" class="button primary" id="confirm-import" disabled>Import file</button></div></form></dialog>
+  <dialog id="range-dialog" aria-labelledby="range-title"><form id="range-form"><div class="dialog-heading"><h2 id="range-title">Set investigation window</h2><button type="button" class="icon-button" data-close="range-dialog" aria-label="Close time window dialog">×</button></div><p class="muted">Times are UTC. Replay and filters stay within this window.</p><label class="field-label" for="range-from">From (UTC)</label><input class="field-input" id="range-from" type="datetime-local" step="0.001" required><label class="field-label" for="range-to">To (UTC)</label><input class="field-input" id="range-to" type="datetime-local" step="0.001" required><p class="form-error" id="range-error" role="alert"></p><div class="dialog-actions"><button class="button secondary" type="button" id="full-range-button">Full incident</button><button class="button primary" type="submit">Apply window</button></div></form></dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-heading"><h2 id="help-title">Find your way around</h2><button class="icon-button" data-close="help-dialog" aria-label="Close keyboard shortcuts">×</button></div><dl class="shortcuts"><dt>Focus search</dt><dd><kbd>/</kbd></dd><dt>Play / pause replay</dt><dd><kbd>Space</kbd></dd><dt>Navigate event list</dt><dd><kbd>↑</kbd> <kbd>↓</kbd></dd><dt>Inspect selected event</dt><dd><kbd>Enter</kbd></dd><dt>Bookmark selected event</dt><dd><kbd>B</kbd></dd><dt>Undo view change</dt><dd><kbd>Ctrl / ⌘</kbd> <kbd>Z</kbd></dd><dt>Redo view change</dt><dd><kbd>Ctrl / ⌘</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></dd><dt>Close a dialog</dt><dd><kbd>Esc</kbd></dd></dl><p class="small muted">Shortcuts pause while you type in a field. Filters and replay positions are undoable; notes and bookmarks save independently.</p><p class="small muted">A view link carries filters and position. A recipient also needs the same incident data; use Export to share the full investigation.</p></dialog>
+  <dialog id="delete-dialog" aria-labelledby="delete-title"><div class="dialog-heading"><h2 id="delete-title">Delete this investigation?</h2><button class="icon-button" data-close="delete-dialog" aria-label="Close delete confirmation">×</button></div><p class="muted">This removes its logs, notes, and bookmarks from this browser. Export it first if you want a copy.</p><div class="dialog-actions"><button class="button secondary" data-close="delete-dialog">Keep investigation</button><button class="button danger-fill" id="confirm-delete">Delete locally</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript">Enable JavaScript to use this dashboard.</div></noscript>
+</body>
+</html>
